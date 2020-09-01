@@ -28,7 +28,20 @@ class MyApp extends StatelessWidget {
 class SelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+        ListTile(
+          title: Text("BLE UPDATE (TEST)"),
+        ),
+          ListTile(
+            
+            title: Text("BLUETOOTH UPDATE (TEST)"),
+          )
+        ],
+      ),
+    );
   }
 }
 
