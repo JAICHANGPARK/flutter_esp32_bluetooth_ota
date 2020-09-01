@@ -9,6 +9,17 @@ class SppUpdatePage extends StatefulWidget {
 class _SppUpdatePageState extends State<SppUpdatePage> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            children: [
+              
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
