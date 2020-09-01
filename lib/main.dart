@@ -31,23 +31,30 @@ class MyApp extends StatelessWidget {
 class SelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          ListTile(
-            title: Text("BLE UPDATE (TEST)"),
-            onTap: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage(title: "ble update",)));
-            },
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text("BLE UPDATE (TEST)"),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MyHomePage(
+                            title: "ble update",
+                          )));
+                },
+              ),
+              ListTile(
+                title: Text("BLUETOOTH UPDATE (TEST)"),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SppUpdatePage()));
+                },
+              )
+            ],
           ),
-          ListTile(
-            title: Text("BLUETOOTH UPDATE (TEST)"),
-            onTap: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => SppUpdatePage()));
-            },
-          )
-        ],
+        ),
       ),
     );
   }
