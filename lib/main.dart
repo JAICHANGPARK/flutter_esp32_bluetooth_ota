@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Bluetooth OTA',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -32,6 +32,9 @@ class SelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Bluetooth ESP32 OTA"),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -45,6 +48,9 @@ class SelectPage extends StatelessWidget {
                             title: "ble update",
                           )));
                 },
+              ),
+              Divider(
+                color: Colors.grey,
               ),
               ListTile(
                 title: Text("BLUETOOTH UPDATE (TEST)"),
