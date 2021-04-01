@@ -13,9 +13,9 @@ class DiscoveryPage extends StatefulWidget {
 }
 
 class _DiscoveryPage extends State<DiscoveryPage> {
-  StreamSubscription<BluetoothDiscoveryResult> _streamSubscription;
-  List<BluetoothDiscoveryResult> results = List<BluetoothDiscoveryResult>();
-  bool isDiscovering;
+  StreamSubscription<BluetoothDiscoveryResult>? _streamSubscription;
+  List<BluetoothDiscoveryResult> results = <BluetoothDiscoveryResult>[];
+  late bool isDiscovering;
 
   _DiscoveryPage();
 
@@ -46,7 +46,7 @@ class _DiscoveryPage extends State<DiscoveryPage> {
           });
         });
 
-    _streamSubscription.onDone(() {
+    _streamSubscription!.onDone(() {
       setState(() {
         isDiscovering = false;
       });
@@ -153,10 +153,10 @@ class _DiscoveryPage extends State<DiscoveryPage> {
 
 class BluetoothDeviceListEntry extends ListTile {
   BluetoothDeviceListEntry({
-    @required BluetoothDevice device,
-    int rssi,
-    GestureTapCallback onTap,
-    GestureLongPressCallback onLongPress,
+    required BluetoothDevice device,
+    int? rssi,
+    GestureTapCallback? onTap,
+    GestureLongPressCallback? onLongPress,
     bool enabled = true,
   }) : super(
     onTap: onTap,

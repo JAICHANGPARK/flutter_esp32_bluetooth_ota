@@ -12,8 +12,8 @@ class SppUpdatePage extends StatefulWidget {
 }
 
 class _SppUpdatePageState extends State<SppUpdatePage> {
-  BluetoothDevice _selectedDevice;
-  BluetoothConnection _bluetoothConnection;
+  BluetoothDevice? _selectedDevice;
+  late BluetoothConnection _bluetoothConnection;
 
   @override
   void initState() {
@@ -21,7 +21,7 @@ class _SppUpdatePageState extends State<SppUpdatePage> {
     super.initState();
   }
 
-  Uint8List binDate;
+  late Uint8List binDate;
 
   var chunks = [];
 
@@ -52,7 +52,7 @@ class _SppUpdatePageState extends State<SppUpdatePage> {
               ListTile(
                   title: Text("장치 검색"),
                   onTap: () async {
-                    final BluetoothDevice selectedDevice =
+                    final BluetoothDevice? selectedDevice =
                         await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DiscoveryPage()));
                     if (selectedDevice != null) {
                       print('Discovery -> selected ' + selectedDevice.address);
@@ -65,7 +65,7 @@ class _SppUpdatePageState extends State<SppUpdatePage> {
                 title: Text("장치 연결"),
                 onTap: () async {
                   if (_selectedDevice != null) {
-                    _bluetoothConnection = await BluetoothConnection.toAddress(_selectedDevice.address);
+                    _bluetoothConnection = await BluetoothConnection.toAddress(_selectedDevice!.address);
                   } else {
                     print("장치 선택 필요");
                   }

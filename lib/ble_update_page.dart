@@ -9,8 +9,8 @@ import 'package:permission_handler/permission_handler.dart';
 
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -19,12 +19,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   bool _deviceConnected = false;
-  StreamSubscription _scanSubscription;
-  StreamSubscription _stateSubscription;
+  late StreamSubscription _scanSubscription;
+  StreamSubscription? _stateSubscription;
 
-  FlutterBlue flutterBlue = FlutterBlue.instance;
-  BluetoothCharacteristic binWriteCharacteristic;
-  BluetoothDevice bluetoothDevice;
+  FlutterBlue? flutterBlue = FlutterBlue.instance;
+  late BluetoothCharacteristic binWriteCharacteristic;
+  late BluetoothDevice bluetoothDevice;
 
   void _incrementCounter() {
     setState(() {
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print(statuses[Permission.location]);
   }
 
-  Uint8List binDate;
+  late Uint8List binDate;
   var chunks = [];
 
   Future<void> readBinFile() async {
@@ -72,13 +72,13 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     getPermission();
     readBinFile().then((value) {
-      _scanSubscription = flutterBlue.scan().listen((results) async {
+      _scanSubscription = flutterBlue!.scan().listen((results) async {
         // do something with scan results
         print(results.device.name);
         if (results.device.name == "UARTService") {
           print("Device Find");
           bluetoothDevice = results.device;
-          await flutterBlue.stopScan();
+          await flutterBlue!.stopScan();
           await bluetoothDevice.connect(autoConnect: false);
           setState(() {
             _deviceConnected = true;
@@ -105,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     // TODO: implement dispose
     _scanSubscription.cancel();
-    flutterBlue.stopScan();
+    flutterBlue!.stopScan();
     flutterBlue = null;
 
     // bleManager.destroyClient();
@@ -116,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title!),
       ),
       body: Center(
         child: Column(
