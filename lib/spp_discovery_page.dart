@@ -89,9 +89,9 @@ class _DiscoveryPage extends State<DiscoveryPage> {
       body: ListView.builder(
         itemCount: results.length,
         itemBuilder: (BuildContext context, index) {
-          BluetoothDiscoveryResult result = results[index];
+          BluetoothDiscoveryResult? result = results[index];
           return BluetoothDeviceListEntry(
-            device: result.device,
+            device: result.device!,
             rssi: result.rssi,
             onTap: () {
               Navigator.of(context).pop(result.device);
@@ -99,24 +99,24 @@ class _DiscoveryPage extends State<DiscoveryPage> {
             onLongPress: () async {
               try {
                 bool bonded = false;
-                if (result.device.isBonded) {
-                  print('Unbonding from ${result.device.address}...');
+                if (result.device!.isBonded) {
+                  print('Unbonding from ${result.device!.address}...');
                   await FlutterBluetoothSerial.instance
-                      .removeDeviceBondWithAddress(result.device.address);
-                  print('Unbonding from ${result.device.address} has succed');
+                      .removeDeviceBondWithAddress(result.device!.address!);
+                  print('Unbonding from ${result.device!.address} has succed');
                 } else {
-                  print('Bonding with ${result.device.address}...');
-                  bonded = await FlutterBluetoothSerial.instance
-                      .bondDeviceAtAddress(result.device.address);
+                  print('Bonding with ${result.device!.address}...');
+                  bonded = (await FlutterBluetoothSerial.instance
+                      .bondDeviceAtAddress(result?.device?.address))!;
                   print(
-                      'Bonding with ${result.device.address} has ${bonded ? 'succed' : 'failed'}.');
+                      'Bonding with ${result.device!.address} has ${bonded ? 'succed' : 'failed'}.');
                 }
                 setState(() {
                   results[results.indexOf(result)] = BluetoothDiscoveryResult(
                       device: BluetoothDevice(
-                        name: result.device.name ?? '',
-                        address: result.device.address,
-                        type: result.device.type,
+                        name: result.device?.name ?? '',
+                        address: result.device?.address,
+                        type: result.device!.type,
                         bondState: bonded
                             ? BluetoothBondState.bonded
                             : BluetoothBondState.none,

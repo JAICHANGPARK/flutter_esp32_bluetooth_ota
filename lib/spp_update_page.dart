@@ -55,7 +55,7 @@ class _SppUpdatePageState extends State<SppUpdatePage> {
                     final BluetoothDevice? selectedDevice =
                         await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DiscoveryPage()));
                     if (selectedDevice != null) {
-                      print('Discovery -> selected ' + selectedDevice.address);
+                      print('Discovery -> selected ' + selectedDevice.address!);
                       _selectedDevice = selectedDevice;
                     } else {
                       print('Discovery -> no device selected');
