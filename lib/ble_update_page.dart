@@ -49,6 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   late Uint8List binDate;
   var chunks = [];
+  var chunkSize = 512;
+  num chunksLength = 0;
+  String progressText = "";
 
   Future<void> readBinFile() async {
     ByteData result = await rootBundle.load('assets/update.bin');
@@ -56,13 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
     print("파일 읽은 길이 : ${tmp.length}");
     binDate = tmp;
     var len = binDate.length;
-    var size = 20;
 
-    for (var i = 0; i < len; i += size) {
-      var end = (i + size < len) ? i + size : len;
+
+    for (var i = 0; i < len; i += chunkSize) {
+      var end = (i + chunkSize < len) ? i + chunkSize : len;
       chunks.add(binDate.sublist(i, end));
     }
     print(chunks);
+    chunksLength = chunks.length;
     print("chunks길이: ${chunks.length}");
   }
 
@@ -75,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _scanSubscription = flutterBlue!.scan().listen((results) async {
         // do something with scan results
         print(results.device.name);
-        if (results.device.name == "UARTService") {
+        if (results.device.name == "UART Service") {
           print("Device Find");
           bluetoothDevice = results.device;
           await flutterBlue!.stopScan();
@@ -89,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
               print("service: $service");
               for (BluetoothCharacteristic bluetoothCharacteristic in service.characteristics) {
                 print("char: ${bluetoothCharacteristic.uuid.toString()}");
-                if (bluetoothCharacteristic.uuid.toString().toLowerCase() == "0000ff26-0000-1000-8000-00805f9b34fb") {
+                if (bluetoothCharacteristic.uuid.toString().toLowerCase() == "0000ff01-0000-1000-8000-00805f9b34fb") {
                   binWriteCharacteristic = bluetoothCharacteristic;
                 }
               }
@@ -137,16 +141,26 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height: 24,
             ),
-            MaterialButton(
+            ElevatedButton(
+                child: Text("Mtu 설정"),
+                onPressed: () async {
+                  await bluetoothDevice.requestMtu(chunkSize);
+
+                }),
+            ElevatedButton(
                 child: Text("보내기"),
                 onPressed: () async {
+
                   for (int i = 0; i < chunks.length; i++) {
-                    Future.delayed(Duration(milliseconds: 250), () async{
-                      print("인덱스 : $i");
-                      await binWriteCharacteristic.write(chunks[i], withoutResponse: true);
+                    print("인덱스: $i");
+                    await Future.delayed(Duration(milliseconds: 10));
+                    await binWriteCharacteristic.write(chunks[i]);
+                    setState(() {
+                      progressText = "$i / $chunksLength";
                     });
                   }
                 }),
+            Text("Now/Total: $progressText")
           ],
         ),
       ),
@@ -161,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         tooltip: 'Increment',
         backgroundColor: _deviceConnected ? Colors.green : Colors.red,
-        child: Icon(Icons.add),
+        child: _deviceConnected ? Icon(Icons.clear) : Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
