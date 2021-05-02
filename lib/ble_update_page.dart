@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String progressTimeText = "";
 
   Future<void> readBinFile() async {
-    ByteData result = await rootBundle.load('assets/update.bin');
+    ByteData result = await rootBundle.load('assets/update1000.bin');
     Uint8List tmp = result.buffer.asUint8List();
     print("파일 읽은 길이 : ${tmp.length}");
     binDate = tmp;
