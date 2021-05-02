@@ -20,6 +20,8 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   permission_handler: ^7.1.0
+  percent_indicator: any
+
   flutter_bluetooth_serial:
     git:
       url: https://github.com/kechankrisna/flutter_bluetooth_serial.git
