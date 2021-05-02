@@ -199,6 +199,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           ((event[1] << 8) & 0x0000ff00) |
                           (event[0] & 0x000000ff);
                       print("Notify index : $_index");
+
+
                       
                       if (_index == chunksLength.toInt()) {
                         print(">>> stop _index == chunksLength.toInt()");
@@ -262,9 +264,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
              CircularPercentIndicator(
               radius: 120.0,
-              lineWidth: 8.0,
+              lineWidth: 12.0,
               percent: _percent,
-              center: new Text("${_percent.toStringAsFixed(2)}"),
+              center: Text("${(_percent * 100).toStringAsFixed(1)} %"),
               progressColor: Colors.green,
             )
 
