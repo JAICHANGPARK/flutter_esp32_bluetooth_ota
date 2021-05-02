@@ -200,8 +200,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           (event[0] & 0x000000ff);
                       print("Notify index : $_index");
 
-
-                      
                       if (_index == chunksLength.toInt()) {
                         print(">>> stop _index == chunksLength.toInt()");
                         endTime = DateTime.now().millisecondsSinceEpoch;
@@ -214,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         binWriteCharacteristic.write(chunks[_index]);
                       }
                       setState(() {
-                        _percent = (_index /chunksLength) ;
+                        _percent = (_index / chunksLength);
                         progressText = "$_index / $chunksLength";
                       });
                     }
@@ -257,20 +255,23 @@ class _MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                "소요시간(분): ${((endTime - startTime) ~/ 1000 ) ~/ 60} 분",
+                "소요시간(분): ${((endTime - startTime) ~/ 1000) ~/ 60} 분",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
 
-             CircularPercentIndicator(
+            CircularPercentIndicator(
               radius: 120.0,
               lineWidth: 12.0,
               percent: _percent,
-              center: Text("${(_percent * 100).toStringAsFixed(1)} %"),
+              center: Text(
+                "${(_percent * 100).toStringAsFixed(1)} %",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               progressColor: Colors.green,
             )
-
-
           ],
         ),
       ),
