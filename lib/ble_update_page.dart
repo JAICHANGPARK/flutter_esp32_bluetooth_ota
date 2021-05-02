@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -28,6 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late BluetoothDevice bluetoothDevice;
 
   int totalBinSize = 0;
+  double _percent = 0.0;
 
   void _incrementCounter() {
     setState(() {
@@ -197,6 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ((event[1] << 8) & 0x0000ff00) |
                           (event[0] & 0x000000ff);
                       print("Notify index : $_index");
+                      
                       if (_index == chunksLength.toInt()) {
                         print(">>> stop _index == chunksLength.toInt()");
                         endTime = DateTime.now().millisecondsSinceEpoch;
@@ -209,6 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         binWriteCharacteristic.write(chunks[_index]);
                       }
                       setState(() {
+                        _percent = (_index /chunksLength) ;
                         progressText = "$_index / $chunksLength";
                       });
                     }
@@ -235,25 +239,33 @@ class _MyHomePageState extends State<MyHomePage> {
                   // });
                 }),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 "Now/Total: $progressText",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 "소요시간(ms): $progressTimeText ms (${chunks.length}조각 $chunkSize) ",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 "소요시간(분): ${((endTime - startTime) ~/ 1000 ) ~/ 60} 분",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+            ),
+
+             CircularPercentIndicator(
+              radius: 120.0,
+              lineWidth: 8.0,
+              percent: _percent,
+              center: new Text("${_percent.toStringAsFixed(2)}"),
+              progressColor: Colors.green,
             )
 
 
