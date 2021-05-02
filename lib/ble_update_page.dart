@@ -27,8 +27,6 @@ class _MyHomePageState extends State<MyHomePage> {
   late BluetoothCharacteristic indexNotifyCharacteristic;
   late BluetoothDevice bluetoothDevice;
 
-
-
   int totalBinSize = 0;
 
   void _incrementCounter() {
@@ -104,8 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 } else if (bluetoothCharacteristic.uuid.toString().toLowerCase() ==
                     "0000ff03-0000-1000-8000-00805f9b34fb") {
                   binSizeWriteCharacteristic = bluetoothCharacteristic;
-                }
-                else if (bluetoothCharacteristic.uuid.toString().toLowerCase() ==
+                } else if (bluetoothCharacteristic.uuid.toString().toLowerCase() ==
                     "0000ff02-0000-1000-8000-00805f9b34fb") {
                   indexNotifyCharacteristic = bluetoothCharacteristic;
                 }
@@ -172,22 +169,39 @@ class _MyHomePageState extends State<MyHomePage> {
                     (totalBinSize >> 24) & 0xFF,
                     (totalBinSize >> 16) & 0xFF,
                     (totalBinSize >> 8) & 0xFF,
-                    (totalBinSize) & 0xFF
+                    (totalBinSize) & 0xFF,
+                    (chunksLength.toInt() >> 24) & 0xFF,
+                    (chunksLength.toInt() >> 16) & 0xFF,
+                    (chunksLength.toInt() >> 8) & 0xFF,
+                    (chunksLength.toInt()) & 0xFF,
                   ]);
                 }),
 
             ElevatedButton(
                 child: Text("PSRAM 해제"),
                 onPressed: () async {
-                  await binSizeWriteCharacteristic.write([0x00, 0x00, 0x00, 0x00]);
+                  await binSizeWriteCharacteristic.write([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
                 }),
             ElevatedButton(
                 child: Text("Index Notify"),
                 onPressed: () async {
                   await indexNotifyCharacteristic.setNotifyValue(true);
                   _indexSubscription = indexNotifyCharacteristic.value.listen((event) {
-                    if(event.length > 0){
-                      
+                    if (event.length > 0) {
+                      print(event);
+                      int _index = ((event[3] << 24) & 0xff000000) |
+                          ((event[2] << 16) & 0x00ff0000) |
+                          ((event[1] << 8) & 0x0000ff00) |
+                          (event[0] & 0x000000ff);
+                      print("Notify index : $_index");
+                      if(_index == chunksLength.toInt()){
+                        print(">>> stop _index == chunksLength.toInt()");
+                      }else{
+                        binWriteCharacteristic.write(chunks[_index]);
+                      }
+                      setState(() {
+                        progressText = "${event[0]} / $chunksLength";
+                      });
                     }
                   });
                 }),
@@ -195,14 +209,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text("보내기"),
                 onPressed: () async {
                   int startTime = DateTime.now().millisecondsSinceEpoch;
-                  for (int i = 0; i < chunks.length; i++) {
-                    print("인덱스: $i");
-                    await Future.delayed(Duration(milliseconds: 10));
-                    await binWriteCharacteristic.write(chunks[i]);
-                    setState(() {
-                      progressText = "$i / $chunksLength";
-                    });
-                  }
+                  await binWriteCharacteristic.write(chunks[0]);
+                  // for (int i = 0; i < chunks.length; i++) {
+                  //   print("인덱스: $i");
+                  //   await Future.delayed(Duration(milliseconds: 10));
+                  //   await binWriteCharacteristic.write(chunks[i]);
+                  //   setState(() {
+                  //     progressText = "$i / $chunksLength";
+                  //   });
+                  // }
                   int endTime = DateTime.now().millisecondsSinceEpoch;
                   print("총 소요시간: ${endTime - startTime}");
 
