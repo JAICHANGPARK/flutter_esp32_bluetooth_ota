@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, this.title}) : super(key: key);
@@ -24,6 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   FlutterBlue? flutterBlue = FlutterBlue.instance;
   late BluetoothCharacteristic binWriteCharacteristic;
+  late BluetoothCharacteristic binSizeWriteCharacteristic;
   late BluetoothDevice bluetoothDevice;
 
   void _incrementCounter() {
@@ -52,14 +51,14 @@ class _MyHomePageState extends State<MyHomePage> {
   var chunkSize = 512;
   num chunksLength = 0;
   String progressText = "";
+  String progressTimeText = "";
 
   Future<void> readBinFile() async {
-    ByteData result = await rootBundle.load('assets/update.bin');
+    ByteData result = await rootBundle.load('assets/update1000.bin');
     Uint8List tmp = result.buffer.asUint8List();
     print("파일 읽은 길이 : ${tmp.length}");
     binDate = tmp;
     var len = binDate.length;
-
 
     for (var i = 0; i < len; i += chunkSize) {
       var end = (i + chunkSize < len) ? i + chunkSize : len;
@@ -96,6 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (bluetoothCharacteristic.uuid.toString().toLowerCase() == "0000ff01-0000-1000-8000-00805f9b34fb") {
                   binWriteCharacteristic = bluetoothCharacteristic;
                 }
+                else if (bluetoothCharacteristic.uuid.toString().toLowerCase() == "0000ff03-0000-1000-8000-00805f9b34fb") {
+                  binSizeWriteCharacteristic = bluetoothCharacteristic;
+                }
               }
             }
           });
@@ -126,17 +128,20 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            // Text(
+            //   'You have pushed the button this many times:',
+            // ),
+            // Text(
+            //   '$_counter',
+            //   style: Theme.of(context).textTheme.headline4,
+            // ),
             MaterialButton(
+                color: _deviceConnected ? Colors.red : Colors.grey,
                 child: Text("연결 종료"),
                 onPressed: () async {
-                  bluetoothDevice.disconnect();
+                  if (_deviceConnected) {
+                    bluetoothDevice.disconnect();
+                  }
                 }),
             SizedBox(
               height: 24,
@@ -145,12 +150,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text("Mtu 설정"),
                 onPressed: () async {
                   await bluetoothDevice.requestMtu(chunkSize);
-
                 }),
             ElevatedButton(
                 child: Text("보내기"),
                 onPressed: () async {
-
+                  int startTime = DateTime.now().millisecondsSinceEpoch;
                   for (int i = 0; i < chunks.length; i++) {
                     print("인덱스: $i");
                     await Future.delayed(Duration(milliseconds: 10));
@@ -159,8 +163,27 @@ class _MyHomePageState extends State<MyHomePage> {
                       progressText = "$i / $chunksLength";
                     });
                   }
+                  int endTime = DateTime.now().millisecondsSinceEpoch;
+                  print("총 소요시간: ${endTime-startTime}");
+
+                  setState(() {
+                    progressTimeText = (endTime-startTime).toString();
+                  });
                 }),
-            Text("Now/Total: $progressText")
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text("Now/Total: $progressText", style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold
+              ),),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text("소요시간: $progressTimeText ms (${chunks.length}조각 $chunkSize) ", style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+              ),),
+            )
           ],
         ),
       ),
