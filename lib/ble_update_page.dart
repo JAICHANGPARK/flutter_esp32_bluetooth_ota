@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // bleManager.destroyClient();
     super.dispose();
   }
-
+  int startTime = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,6 +196,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       print("Notify index : $_index");
                       if(_index == chunksLength.toInt()){
                         print(">>> stop _index == chunksLength.toInt()");
+                        int endTime = DateTime.now().millisecondsSinceEpoch;
+                        print("총 소요시간: ${endTime - startTime}");
+
+                        setState(() {
+                          progressTimeText = (endTime - startTime).toString();
+                        });
                       }else{
                         binWriteCharacteristic.write(chunks[_index]);
                       }
@@ -208,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
                 child: Text("보내기"),
                 onPressed: () async {
-                  int startTime = DateTime.now().millisecondsSinceEpoch;
+                  startTime = DateTime.now().millisecondsSinceEpoch;
                   await binWriteCharacteristic.write(chunks[0]);
                   // for (int i = 0; i < chunks.length; i++) {
                   //   print("인덱스: $i");
@@ -218,12 +224,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   //     progressText = "$i / $chunksLength";
                   //   });
                   // }
-                  int endTime = DateTime.now().millisecondsSinceEpoch;
-                  print("총 소요시간: ${endTime - startTime}");
-
-                  setState(() {
-                    progressTimeText = (endTime - startTime).toString();
-                  });
+                  // int endTime = DateTime.now().millisecondsSinceEpoch;
+                  // print("총 소요시간: ${endTime - startTime}");
+                  //
+                  // setState(() {
+                  //   progressTimeText = (endTime - startTime).toString();
+                  // });
                 }),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
