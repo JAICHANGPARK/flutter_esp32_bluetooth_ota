@@ -19,11 +19,17 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _deviceConnected = false;
   late StreamSubscription _scanSubscription;
   StreamSubscription? _stateSubscription;
+  StreamSubscription? _indexSubscription;
 
   FlutterBlue? flutterBlue = FlutterBlue.instance;
   late BluetoothCharacteristic binWriteCharacteristic;
   late BluetoothCharacteristic binSizeWriteCharacteristic;
+  late BluetoothCharacteristic indexNotifyCharacteristic;
   late BluetoothDevice bluetoothDevice;
+
+
+
+  int totalBinSize = 0;
 
   void _incrementCounter() {
     setState(() {
@@ -59,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print("파일 읽은 길이 : ${tmp.length}");
     binDate = tmp;
     var len = binDate.length;
+    totalBinSize = len;
 
     for (var i = 0; i < len; i += chunkSize) {
       var end = (i + chunkSize < len) ? i + chunkSize : len;
@@ -94,9 +101,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 print("char: ${bluetoothCharacteristic.uuid.toString()}");
                 if (bluetoothCharacteristic.uuid.toString().toLowerCase() == "0000ff01-0000-1000-8000-00805f9b34fb") {
                   binWriteCharacteristic = bluetoothCharacteristic;
-                }
-                else if (bluetoothCharacteristic.uuid.toString().toLowerCase() == "0000ff03-0000-1000-8000-00805f9b34fb") {
+                } else if (bluetoothCharacteristic.uuid.toString().toLowerCase() ==
+                    "0000ff03-0000-1000-8000-00805f9b34fb") {
                   binSizeWriteCharacteristic = bluetoothCharacteristic;
+                }
+                else if (bluetoothCharacteristic.uuid.toString().toLowerCase() ==
+                    "0000ff02-0000-1000-8000-00805f9b34fb") {
+                  indexNotifyCharacteristic = bluetoothCharacteristic;
                 }
               }
             }
@@ -111,6 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     // TODO: implement dispose
     _scanSubscription.cancel();
+    _indexSubscription?.cancel();
+
     flutterBlue!.stopScan();
     flutterBlue = null;
 
@@ -151,6 +164,33 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () async {
                   await bluetoothDevice.requestMtu(chunkSize);
                 }),
+
+            ElevatedButton(
+                child: Text("PSRAM 세팅"),
+                onPressed: () async {
+                  await binSizeWriteCharacteristic.write([
+                    (totalBinSize >> 24) & 0xFF,
+                    (totalBinSize >> 16) & 0xFF,
+                    (totalBinSize >> 8) & 0xFF,
+                    (totalBinSize) & 0xFF
+                  ]);
+                }),
+
+            ElevatedButton(
+                child: Text("PSRAM 해제"),
+                onPressed: () async {
+                  await binSizeWriteCharacteristic.write([0x00, 0x00, 0x00, 0x00]);
+                }),
+            ElevatedButton(
+                child: Text("Index Notify"),
+                onPressed: () async {
+                  await indexNotifyCharacteristic.setNotifyValue(true);
+                  _indexSubscription = indexNotifyCharacteristic.value.listen((event) {
+                    if(event.length > 0){
+                      
+                    }
+                  });
+                }),
             ElevatedButton(
                 child: Text("보내기"),
                 onPressed: () async {
@@ -164,25 +204,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     });
                   }
                   int endTime = DateTime.now().millisecondsSinceEpoch;
-                  print("총 소요시간: ${endTime-startTime}");
+                  print("총 소요시간: ${endTime - startTime}");
 
                   setState(() {
-                    progressTimeText = (endTime-startTime).toString();
+                    progressTimeText = (endTime - startTime).toString();
                   });
                 }),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text("Now/Total: $progressText", style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold
-              ),),
+              child: Text(
+                "Now/Total: $progressText",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text("소요시간: $progressTimeText ms (${chunks.length}조각 $chunkSize) ", style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-              ),),
+              child: Text(
+                "소요시간: $progressTimeText ms (${chunks.length}조각 $chunkSize) ",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             )
           ],
         ),
