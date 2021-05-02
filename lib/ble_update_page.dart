@@ -200,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         binWriteCharacteristic.write(chunks[_index]);
                       }
                       setState(() {
-                        progressText = "${event[0]} / $chunksLength";
+                        progressText = "$_index / $chunksLength";
                       });
                     }
                   });
