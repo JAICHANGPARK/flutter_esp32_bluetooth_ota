@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String progressTimeText = "";
 
   Future<void> readBinFile() async {
-    ByteData result = await rootBundle.load('assets/update1000.bin');
+    ByteData result = await rootBundle.load('assets/update.bin');
     Uint8List tmp = result.buffer.asUint8List();
     print("파일 읽은 길이 : ${tmp.length}");
     binDate = tmp;
@@ -129,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   int startTime = 0;
+  int endTime = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       print("Notify index : $_index");
                       if (_index == chunksLength.toInt()) {
                         print(">>> stop _index == chunksLength.toInt()");
-                        int endTime = DateTime.now().millisecondsSinceEpoch;
+                        endTime = DateTime.now().millisecondsSinceEpoch;
                         print("총 소요시간: ${endTime - startTime}");
 
                         setState(() {
@@ -243,10 +244,19 @@ class _MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                "소요시간: $progressTimeText ms (${chunks.length}조각 $chunkSize) ",
+                "소요시간(ms): $progressTimeText ms (${chunks.length}조각 $chunkSize) ",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                "소요시간(분): ${((endTime - startTime) ~/ 1000 ) ~/ 60} 분",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             )
+
+
           ],
         ),
       ),
