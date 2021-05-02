@@ -127,7 +127,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // bleManager.destroyClient();
     super.dispose();
   }
+
   int startTime = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ((event[1] << 8) & 0x0000ff00) |
                           (event[0] & 0x000000ff);
                       print("Notify index : $_index");
-                      if(_index == chunksLength.toInt()){
+                      if (_index == chunksLength.toInt()) {
                         print(">>> stop _index == chunksLength.toInt()");
                         int endTime = DateTime.now().millisecondsSinceEpoch;
                         print("총 소요시간: ${endTime - startTime}");
@@ -202,7 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         setState(() {
                           progressTimeText = (endTime - startTime).toString();
                         });
-                      }else{
+                      } else {
                         binWriteCharacteristic.write(chunks[_index]);
                       }
                       setState(() {
